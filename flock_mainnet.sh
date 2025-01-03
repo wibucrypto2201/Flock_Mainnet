@@ -30,7 +30,7 @@ else
     success "Anaconda installer already exists."
 fi
 
-# Step 2: Handle existing Anaconda installation
+# Step 2: Install Anaconda
 if [ -d "$HOME/anaconda3" ]; then
     echo "Anaconda installation detected at $HOME/anaconda3."
     read -p "Would you like to update (u) or remove and reinstall (r)? [u/r]: " choice
@@ -67,32 +67,34 @@ source ~/.bashrc || error_exit "Failed to configure environment"
 conda init || error_exit "Failed to initialize Conda"
 success "Environment configured successfully."
 
-# Step 4: Continue without restarting shell
-echo "Continuing without restarting shell..."
-
-# Step 5: Clone repository
+# Step 4: Clone repository
 echo "Cloning the repository..."
 git clone https://github.com/FLock-io/llm-loss-validator.git || error_exit "Failed to clone repository"
 success "Repository cloned successfully."
 
-# Step 6: Navigate to project directory
+# Step 5: Navigate to project directory
 echo "Navigating to project directory..."
 cd llm-loss-validator || error_exit "Failed to navigate to project directory"
 success "Navigated to project directory."
 
-# Step 7: Create Conda environment
-echo "Creating Conda environment..."
-conda create -n llm-loss-validator python==3.10 -y || error_exit "Failed to create Conda environment"
-success "Conda environment created successfully."
+# Step 6: Activate base environment
+echo "Activating Conda base environment..."
+source $HOME/anaconda3/bin/activate base || error_exit "Failed to activate Conda base environment"
+success "Conda base environment activated successfully."
 
-# Step 8: Activate Conda environment
-echo "Activating Conda environment: llm-loss-validator..."
-source $HOME/anaconda3/bin/activate llm-loss-validator || error_exit "Failed to activate Conda environment"
-success "Conda environment activated successfully."
-
-# Step 9: Install Python packages
+# Step 7: Install Python packages
 echo "Installing required Python packages..."
 pip install -r requirements.txt || error_exit "Failed to install required Python packages"
 success "Python packages installed successfully."
+
+# Step 8: Resolve dependency conflicts
+echo "Resolving package conflicts..."
+pip install fsspec==2024.6.1 || error_exit "Failed to resolve fsspec conflict"
+
+# Recheck the environment
+echo "Checking installed packages..."
+pip check || error_exit "Package conflict still exists"
+
+success "Python packages installed and configured successfully."
 
 echo -e "${GREEN}Setup complete!${RESET}"
