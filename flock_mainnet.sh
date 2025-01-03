@@ -19,6 +19,40 @@ success() {
     echo -e "${GREEN}$1${RESET}"
 }
 
+# Check if second phase should be executed
+if [ "$1" == "--continue" ]; then
+    echo "Continuing from restarted shell..."
+
+    # Step 5: Clone repository
+    echo "Cloning the repository..."
+    git clone https://github.com/FLock-io/llm-loss-validator.git || error_exit "Failed to clone repository"
+    success "Repository cloned successfully."
+
+    # Step 6: Navigate to project directory
+    echo "Navigating to project directory..."
+    cd llm-loss-validator || error_exit "Failed to navigate to project directory"
+    success "Navigated to project directory."
+
+    # Step 7: Create Conda environment
+    echo "Creating Conda environment..."
+    conda create -n llm-loss-validator python==3.10 -y || error_exit "Failed to create Conda environment"
+    success "Conda environment created successfully."
+
+    # Step 8: Activate Conda environment
+    echo "Activating Conda environment: llm-loss-validator..."
+    conda activate llm-loss-validator || error_exit "Failed to activate Conda environment"
+    success "Conda environment activated successfully."
+
+    # Step 9: Install Python packages
+    echo "Installing required Python packages..."
+    pip install -r requirements.txt || error_exit "Failed to install required Python packages"
+    success "Python packages installed successfully."
+
+    echo -e "${GREEN}Setup complete!${RESET}"
+    exit 0
+fi
+
+# First phase of the script
 echo "Starting the setup process..."
 
 # Step 1: Download Anaconda
@@ -68,32 +102,6 @@ conda init || error_exit "Failed to initialize Conda"
 success "Environment configured successfully."
 
 # Step 4: Restart shell (required for conda to be fully configured)
-echo "Restarting shell..."
-exec bash || error_exit "Failed to restart shell"
-
-# Step 5: Clone repository
-echo "Cloning the repository..."
-git clone https://github.com/FLock-io/llm-loss-validator.git || error_exit "Failed to clone repository"
-success "Repository cloned successfully."
-
-# Step 6: Navigate to project directory
-echo "Navigating to project directory..."
-cd llm-loss-validator || error_exit "Failed to navigate to project directory"
-success "Navigated to project directory."
-
-# Step 7: Create Conda environment
-echo "Creating Conda environment..."
-conda create -n llm-loss-validator python==3.10 -y || error_exit "Failed to create Conda environment"
-success "Conda environment created successfully."
-
-# Step 8: Activate Conda environment
-echo "Activating Conda environment: llm-loss-validator..."
-conda activate llm-loss-validator || error_exit "Failed to activate Conda environment"
-success "Conda environment activated successfully."
-
-# Step 9: Install Python packages
-echo "Installing required Python packages..."
-pip install -r requirements.txt || error_exit "Failed to install required Python packages"
-success "Python packages installed successfully."
-
-echo -e "${GREEN}Setup complete!${RESET}"
+echo -e "${GREEN}Restarting shell... Please run:${RESET}"
+echo -e "${GREEN}  ./flock_mainnet.sh --continue${RESET}"
+exec bash
