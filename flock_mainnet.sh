@@ -71,17 +71,27 @@ success "Environment configured successfully."
 echo "Restarting shell..."
 exec bash || error_exit "Failed to restart shell"
 
-# Step 5: Activate conda environment
-echo "Activating conda environment: llm-loss-validator..."
-conda activate llm-loss-validator || error_exit "Failed to activate conda environment"
-success "Conda environment activated successfully."
+# Step 5: Clone repository
+echo "Cloning the repository..."
+git clone https://github.com/FLock-io/llm-loss-validator.git || error_exit "Failed to clone repository"
+success "Repository cloned successfully."
 
 # Step 6: Navigate to project directory
 echo "Navigating to project directory..."
 cd llm-loss-validator || error_exit "Failed to navigate to project directory"
 success "Navigated to project directory."
 
-# Step 7: Install Python packages
+# Step 7: Create Conda environment
+echo "Creating Conda environment..."
+conda create -n llm-loss-validator python==3.10 -y || error_exit "Failed to create Conda environment"
+success "Conda environment created successfully."
+
+# Step 8: Activate Conda environment
+echo "Activating Conda environment: llm-loss-validator..."
+conda activate llm-loss-validator || error_exit "Failed to activate Conda environment"
+success "Conda environment activated successfully."
+
+# Step 9: Install Python packages
 echo "Installing required Python packages..."
 pip install -r requirements.txt || error_exit "Failed to install required Python packages"
 success "Python packages installed successfully."
