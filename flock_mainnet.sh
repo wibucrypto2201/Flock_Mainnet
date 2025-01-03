@@ -21,16 +21,26 @@ success() {
 
 echo "Starting the setup process..."
 
-# Step 1: Download and Install Anaconda
-echo "Downloading Anaconda..."
-wget -O anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh || error_exit "Failed to download Anaconda"
-success "Anaconda downloaded successfully."
+# Step 1: Download Anaconda
+if [ ! -f "anaconda.sh" ]; then
+    echo "Downloading Anaconda..."
+    wget -O anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh || error_exit "Failed to download Anaconda"
+    success "Anaconda downloaded successfully."
+else
+    success "Anaconda installer already exists."
+fi
 
-echo "Installing Anaconda..."
-bash anaconda.sh -b -p $HOME/anaconda3 || error_exit "Failed to install Anaconda"
-success "Anaconda installed successfully."
+# Step 2: Install Anaconda
+if [ -d "$HOME/anaconda3" ]; then
+    echo "Anaconda already installed. Updating..."
+    bash anaconda.sh -b -u -p $HOME/anaconda3 || error_exit "Failed to update Anaconda"
+else
+    echo "Installing Anaconda..."
+    bash anaconda.sh -b -p $HOME/anaconda3 || error_exit "Failed to install Anaconda"
+fi
+success "Anaconda installation complete."
 
-# Step 2: Configure PATH and initialize conda
+# Step 3: Configure PATH and initialize conda
 echo "Configuring environment..."
 export PATH="$HOME/anaconda3/bin:$PATH"
 echo 'export PATH="$HOME/anaconda3/bin:$PATH"' >> ~/.bashrc
@@ -40,21 +50,21 @@ source ~/.bashrc || error_exit "Failed to configure environment"
 conda init || error_exit "Failed to initialize Conda"
 success "Environment configured successfully."
 
-# Step 3: Restart shell (required for conda to be fully configured)
+# Step 4: Restart shell (required for conda to be fully configured)
 echo "Restarting shell..."
 exec bash || error_exit "Failed to restart shell"
 
-# Step 4: Activate conda environment
+# Step 5: Activate conda environment
 echo "Activating conda environment: llm-loss-validator..."
 conda activate llm-loss-validator || error_exit "Failed to activate conda environment"
 success "Conda environment activated successfully."
 
-# Step 5: Navigate to project directory
+# Step 6: Navigate to project directory
 echo "Navigating to project directory..."
 cd llm-loss-validator || error_exit "Failed to navigate to project directory"
 success "Navigated to project directory."
 
-# Step 6: Install Python packages
+# Step 7: Install Python packages
 echo "Installing required Python packages..."
 pip install -r requirements.txt || error_exit "Failed to install required Python packages"
 success "Python packages installed successfully."
