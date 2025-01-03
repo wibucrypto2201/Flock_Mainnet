@@ -87,9 +87,9 @@ echo "Installing required Python packages..."
 pip install -r requirements.txt || error_exit "Failed to install required Python packages"
 success "Python packages installed successfully."
 
-# Step 8: Resolve dependency conflicts
+# Step 8: Resolve package conflicts
 echo "Resolving package conflicts..."
-pip install fsspec==2024.6.1 || error_exit "Failed to resolve fsspec conflict"
+pip install fsspec[http]==2024.3.1 || error_exit "Failed to resolve fsspec conflict"
 
 # Recheck the environment
 echo "Checking installed packages..."
