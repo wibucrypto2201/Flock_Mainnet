@@ -77,24 +77,28 @@ echo "Navigating to project directory..."
 cd llm-loss-validator || error_exit "Failed to navigate to project directory"
 success "Navigated to project directory."
 
-# Step 6: Install Python packages
+# Step 6: Create a clean Conda environment
+echo "Creating a clean Conda environment..."
+conda create -n llm-env python=3.10 -y || error_exit "Failed to create Conda environment"
+source activate llm-env || error_exit "Failed to activate Conda environment"
+success "Conda environment created and activated successfully."
+
+# Step 7: Install packages from requirements.txt
 echo "Installing required Python packages..."
 pip install -r requirements.txt || error_exit "Failed to install required Python packages"
 success "Python packages installed successfully."
 
-# Step 7: Resolve package conflicts
-echo "Resolving package conflicts..."
-
-# Uninstall conflicting packages
+# Step 8: Handle dependency conflicts manually
+echo "Resolving dependency conflicts..."
 pip uninstall -y s3fs fsspec datasets || error_exit "Failed to uninstall conflicting packages"
 
-# Install compatible versions of conflicting packages
-pip install fsspec[http]==2024.3.1 datasets==2.13.0 s3fs==2023.6.0 || error_exit "Failed to install compatible versions of fsspec, datasets, and s3fs"
+# Install compatible versions
+pip install fsspec==2023.6.0 s3fs==2023.6.0 datasets==2.19.2 || error_exit "Failed to install compatible versions of fsspec, s3fs, and datasets"
 
-# Step 8: Final environment check
-echo "Checking installed packages for conflicts..."
+# Step 9: Final environment check
+echo "Checking for any remaining conflicts..."
 pip check || error_exit "Package conflict still exists"
 
-success "Python packages installed and configured successfully."
+success "All dependencies installed and conflicts resolved successfully."
 
 echo -e "${GREEN}Setup complete!${RESET}"
