@@ -77,21 +77,17 @@ echo "Navigating to project directory..."
 cd llm-loss-validator || error_exit "Failed to navigate to project directory"
 success "Navigated to project directory."
 
-# Step 6: Activate base environment
-echo "Activating Conda base environment..."
-source $HOME/anaconda3/bin/activate base || error_exit "Failed to activate Conda base environment"
-success "Conda base environment activated successfully."
-
-# Step 7: Install Python packages
+# Step 6: Install Python packages
 echo "Installing required Python packages..."
 pip install -r requirements.txt || error_exit "Failed to install required Python packages"
 success "Python packages installed successfully."
 
-# Step 8: Resolve package conflicts
+# Step 7: Resolve package conflicts
 echo "Resolving package conflicts..."
-pip install fsspec[http]==2024.3.1 || error_exit "Failed to resolve fsspec conflict"
+pip uninstall s3fs fsspec -y || error_exit "Failed to uninstall conflicting packages"
+pip install s3fs==2024.6.1 fsspec==2024.6.1 || error_exit "Failed to install compatible versions of s3fs and fsspec"
 
-# Recheck the environment
+# Step 8: Check environment
 echo "Checking installed packages..."
 pip check || error_exit "Package conflict still exists"
 
