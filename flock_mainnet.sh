@@ -23,7 +23,7 @@ echo "Starting the setup process..."
 
 # Step 1: Download and Install Anaconda
 echo "Downloading Anaconda..."
-wget https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh -O anaconda.sh || error_exit "Failed to download Anaconda"
+wget -O anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh || error_exit "Failed to download Anaconda"
 success "Anaconda downloaded successfully."
 
 echo "Installing Anaconda..."
@@ -32,9 +32,12 @@ success "Anaconda installed successfully."
 
 # Step 2: Configure PATH and initialize conda
 echo "Configuring environment..."
+export PATH="$HOME/anaconda3/bin:$PATH"
 echo 'export PATH="$HOME/anaconda3/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc || error_exit "Failed to configure environment"
-conda init || error_exit "Failed to initialize conda"
+
+# Initialize Conda
+conda init || error_exit "Failed to initialize Conda"
 success "Environment configured successfully."
 
 # Step 3: Restart shell (required for conda to be fully configured)
