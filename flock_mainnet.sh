@@ -30,15 +30,32 @@ else
     success "Anaconda installer already exists."
 fi
 
-# Step 2: Install Anaconda
+# Step 2: Handle existing Anaconda installation
 if [ -d "$HOME/anaconda3" ]; then
-    echo "Anaconda already installed. Updating..."
-    bash anaconda.sh -b -u -p $HOME/anaconda3 || error_exit "Failed to update Anaconda"
+    echo "Anaconda installation detected at $HOME/anaconda3."
+    read -p "Would you like to update (u) or remove and reinstall (r)? [u/r]: " choice
+    case $choice in
+        u|U)
+            echo "Updating existing Anaconda installation..."
+            bash anaconda.sh -b -u -p $HOME/anaconda3 || error_exit "Failed to update Anaconda"
+            success "Anaconda updated successfully."
+            ;;
+        r|R)
+            echo "Removing existing Anaconda installation..."
+            rm -rf $HOME/anaconda3 || error_exit "Failed to remove existing Anaconda installation"
+            echo "Reinstalling Anaconda..."
+            bash anaconda.sh -b -p $HOME/anaconda3 || error_exit "Failed to install Anaconda"
+            success "Anaconda reinstalled successfully."
+            ;;
+        *)
+            error_exit "Invalid choice. Please rerun the script and choose either 'u' or 'r'."
+            ;;
+    esac
 else
     echo "Installing Anaconda..."
     bash anaconda.sh -b -p $HOME/anaconda3 || error_exit "Failed to install Anaconda"
+    success "Anaconda installed successfully."
 fi
-success "Anaconda installation complete."
 
 # Step 3: Configure PATH and initialize conda
 echo "Configuring environment..."
