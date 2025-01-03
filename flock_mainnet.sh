@@ -84,11 +84,15 @@ success "Python packages installed successfully."
 
 # Step 7: Resolve package conflicts
 echo "Resolving package conflicts..."
-pip uninstall s3fs fsspec -y || error_exit "Failed to uninstall conflicting packages"
-pip install s3fs==2024.6.1 fsspec==2024.6.1 || error_exit "Failed to install compatible versions of s3fs and fsspec"
 
-# Step 8: Check environment
-echo "Checking installed packages..."
+# Uninstall conflicting packages
+pip uninstall -y s3fs fsspec datasets || error_exit "Failed to uninstall conflicting packages"
+
+# Install compatible versions of conflicting packages
+pip install fsspec[http]==2024.3.1 datasets==2.13.0 s3fs==2023.6.0 || error_exit "Failed to install compatible versions of fsspec, datasets, and s3fs"
+
+# Step 8: Final environment check
+echo "Checking installed packages for conflicts..."
 pip check || error_exit "Package conflict still exists"
 
 success "Python packages installed and configured successfully."
