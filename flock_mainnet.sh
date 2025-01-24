@@ -26,7 +26,7 @@ remove_anaconda() {
     echo "Anaconda has been removed."
 }
 
-# Function to install Anaconda
+# Function to install or update Anaconda
 install_anaconda() {
     echo "Downloading Anaconda installer..."
     wget $ANACONDA_URL -O $ANACONDA_INSTALLER
@@ -47,8 +47,13 @@ install_anaconda() {
         exit 1
     fi
 
-    echo "Running Anaconda installer..."
-    bash $ANACONDA_INSTALLER -b -p "$INSTALL_DIR"
+    if [ -d "$INSTALL_DIR" ]; then
+        echo "Anaconda is already installed. Updating the installation..."
+        bash $ANACONDA_INSTALLER -u -p "$INSTALL_DIR"
+    else
+        echo "Installing Anaconda..."
+        bash $ANACONDA_INSTALLER -b -p "$INSTALL_DIR"
+    fi
 
     echo "Adding Anaconda to PATH..."
     echo 'export PATH="$HOME/anaconda3/bin:$PATH"' >> ~/.bashrc
@@ -60,7 +65,7 @@ install_anaconda() {
     echo "Cleaning up..."
     rm $ANACONDA_INSTALLER
 
-    echo "Anaconda installation completed successfully!"
+    echo "Anaconda installation or update completed successfully!"
     echo "Run 'conda --version' to verify installation."
 }
 
@@ -72,8 +77,8 @@ if check_anaconda_installed; then
         remove_anaconda
         install_anaconda
     else
-        echo "Keeping the existing Anaconda installation. Exiting..."
-        exit 0
+        echo "Keeping the existing Anaconda installation. Attempting to update..."
+        install_anaconda
     fi
 else
     install_anaconda
