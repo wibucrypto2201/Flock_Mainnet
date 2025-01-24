@@ -38,19 +38,26 @@ install_anaconda() {
     sha256sum $ANACONDA_INSTALLER
     echo "Please check the checksum at the official site for verification:"
     echo "https://repo.anaconda.com/archive/"
-    read -p "Does the checksum match? (y/n): " checksum_match
-    if [ "$checksum_match" != "y" ]; then
-        echo "Checksum mismatch. Exiting..."
-        exit 1
-    fi
+    echo "Checksum verification skipped for automation purposes."
 
     if [ -d "$INSTALL_DIR" ]; then
         echo "Anaconda is already installed. Updating the installation..."
-        bash $ANACONDA_INSTALLER -u -p "$INSTALL_DIR"
+        bash $ANACONDA_INSTALLER -u -p "$INSTALL_DIR" -f <<EOF
+yes
+EOF
     else
         echo "Installing Anaconda..."
         bash $ANACONDA_INSTALLER -b -p "$INSTALL_DIR"
     fi
+
+    echo "Setting up shell initialization for conda..."
+    # Automatically initialize shell (answer 'yes' to the prompt)
+    $INSTALL_DIR/bin/conda init bash <<EOF
+yes
+EOF
+
+    echo "Disabling auto-activation of the base environment..."
+    $INSTALL_DIR/bin/conda config --set auto_activate_base false
 
     echo "Adding Anaconda to PATH..."
     SHELL_RC="/root/.bashrc"  # Root's shell config
