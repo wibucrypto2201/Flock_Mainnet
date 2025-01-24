@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# Anaconda Auto Installation Script for Ubuntu 22.04
-# Author: [Your Name]
-
+# Anaconda Auto Installation Script for Ubuntu 22.04 (Run as root)
 ANACONDA_INSTALLER="Anaconda3-2024.10-1-Linux-x86_64.sh"
 ANACONDA_URL="https://repo.anaconda.com/archive/$ANACONDA_INSTALLER"
-INSTALL_DIR="$HOME/anaconda3"
+INSTALL_DIR="/root/anaconda3"  # Install in root's home directory
 
 # Function to check if Anaconda is installed
 check_anaconda_installed() {
@@ -22,7 +20,7 @@ check_anaconda_installed() {
 remove_anaconda() {
     echo "Removing existing Anaconda installation..."
     rm -rf "$INSTALL_DIR"
-    sed -i '/anaconda3\/bin/d' ~/.bashrc
+    sed -i '/anaconda3\/bin/d' /root/.bashrc
     echo "Anaconda has been removed."
 }
 
@@ -38,7 +36,6 @@ install_anaconda() {
 
     echo "Verifying installer integrity..."
     sha256sum $ANACONDA_INSTALLER
-
     echo "Please check the checksum at the official site for verification:"
     echo "https://repo.anaconda.com/archive/"
     read -p "Does the checksum match? (y/n): " checksum_match
@@ -56,11 +53,14 @@ install_anaconda() {
     fi
 
     echo "Adding Anaconda to PATH..."
-    echo 'export PATH="$HOME/anaconda3/bin:$PATH"' >> ~/.bashrc
-    source ~/.bashrc
+    SHELL_RC="/root/.bashrc"  # Root's shell config
+    if ! grep -q "$INSTALL_DIR/bin" "$SHELL_RC"; then
+        echo "export PATH=\"$INSTALL_DIR/bin:\$PATH\"" >> "$SHELL_RC"
+    fi
+    source "$SHELL_RC"
 
     echo "Updating Anaconda..."
-    conda update -n base -c defaults conda -y
+    $INSTALL_DIR/bin/conda update -n base -c defaults conda -y
 
     echo "Cleaning up..."
     rm $ANACONDA_INSTALLER
