@@ -50,15 +50,6 @@ EOF
         bash $ANACONDA_INSTALLER -b -p "$INSTALL_DIR"
     fi
 
-    echo "Setting up shell initialization for conda..."
-    # Automatically initialize shell (answer 'yes' to the prompt)
-    $INSTALL_DIR/bin/conda init bash <<EOF
-yes
-EOF
-
-    echo "Disabling auto-activation of the base environment..."
-    $INSTALL_DIR/bin/conda config --set auto_activate_base false
-
     echo "Adding Anaconda to PATH..."
     SHELL_RC="/root/.bashrc"  # Root's shell config
     if ! grep -q "$INSTALL_DIR/bin" "$SHELL_RC"; then
@@ -68,6 +59,9 @@ EOF
 
     echo "Updating Anaconda..."
     $INSTALL_DIR/bin/conda update -n base -c defaults conda -y
+
+    echo "Disabling auto-activation of the base environment..."
+    $INSTALL_DIR/bin/conda config --set auto_activate_base false
 
     echo "Cleaning up..."
     rm $ANACONDA_INSTALLER
